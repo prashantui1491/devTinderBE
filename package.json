@@ -1,0 +1,22 @@
+{
+  "name": "devtinder-be",
+  "version": "1.0.0",
+  "description": "tinder for devs backend service",
+  "keywords": [
+    "node",
+    "js",
+    "and",
+    "js"
+  ],
+  "license": "ISC",
+  "author": "prashant",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
