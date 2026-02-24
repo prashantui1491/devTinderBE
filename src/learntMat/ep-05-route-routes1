@@ -1,0 +1,26 @@
+const express = require('express')
+
+const app = express()
+
+app.use("/user",
+    [
+    (req, res, next)=>{
+    
+    //nested route handler
+    console.log("1st responce execute")
+     next()
+    //res.send("1st responce")
+   
+},(req, res, next)=>{
+    console.log("2st responce execute")
+    //res.send("2nd responce")
+    next()
+}],(req, res)=>{
+    console.log("3rd responce")
+    res.send ("3rd responce")
+})
+
+//listen to the port
+app.listen(7777, ()=>{
+    console.log("Server is successfully listening on port num 7777-1")
+})
