@@ -1,39 +1,45 @@
 const express = require("express");
+const connectDb = require("./config/database")
 
 const app = express();
 
-// app.use("/",(err, req, res, next)=>{
-//     if(err){
-//         res.status(500).send("Something went wrong")
-//     }
-// })
+const User = require("./models/user")
 
-app.get("/getuserdata",(req, res)=>{
-    // try{
-    //     //logic here
-    //     throw new Error("Random error")
-    //     res.send("data sent successfully")
-    // }
-    // catch(err){
-    //     res.status(500).send("Something went wrong, contact support team")
-    // }
-
-      throw new Error("Random error")
-})
-
-//"Wild card route ie "/" keep alwasys towards the end "
-
-app.use("/",(err, req, res, next)=>{
-    if(err){
-        res.status(500).send("Something went wrong")
+//Create API to add users ie /signup
+app.post("/signup", async (rreq, res)=>{
+    const userObj = {
+        firstName : "aarav",
+        lastName : "prashant",
+        emailId: "aarav@prashant.com",
+        passowrd: "aarav123",
+        age: 6,
+        gender: "male"
     }
+try{
+    const user = new User(userObj)
+    await user.save()
+    res.send("user added successfully")
+
+} catch(err){
+    res.status(500).send("Error saving the repsonce", + err.message)
+}
+    
 })
 
 
 
 
-
-//listen to the port
-app.listen(7777, () => {
-  console.log("Server is successfully listening on port num 7777-1");
+connectDb().then(()=>{
+    //first connect to db then listen to the port
+    console.log("Databseconnection established successfuly ...")
+    //listen to the port
+    app.listen(7777, () => {
+    console.log("Server is successfully listening on port num 7777");
 });
+}).catch((err)=>{
+    console.log("Database connection failed")
+})
+
+
+
+
