@@ -65,7 +65,7 @@ app.delete("/user", async (req, res) => {
 
   try {
     const user = await User.findByIdAndDelete(userId);
-    res.send({message:"user deleted succefully",data:user});
+    res.send({ message: "user deleted succefully", data: user });
   } catch (err) {
     res.status(400).send("somwthing went wrong");
   }
@@ -73,29 +73,53 @@ app.delete("/user", async (req, res) => {
 
 //Update user
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req?.params?.userId;
+  const data = req.body;
+  console.log("datacheck",data.skills)
 
   try {
-    const user = await User.findByIdAndUpdate({ _id: userId },data, {returnDocument: "before",runValidators: true});
-    console.log("user", user)
+    const ALLOWED_UPDATES = [
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k),
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update Not Allowed");
+    }
+
+    //added this validation at schema level, hecnec commenting
+
+    // if(data.skills && data.skills.length > 10){
+    //     throw new Error("Skills cannot be more than 10")
+    // }
+
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "before",
+      runValidators: true,
+    });
+    console.log("user", user);
     res.send("User updated successfully");
   } catch (err) {
-    res.status(400).send("Something went wrong" + err.message);
+    res.status(400).send("Something went wrong, " + err.message);
   }
 });
 
-app.get("/trytest",async(req, res)=>{
-    try{
-        const users = await User.find({$where: 'this.age==35'})
-        res.send({message: "users fetched successfully", users})
-    }
-    catch(err){
-        res.status(400).send(err.message)
-    }
-})
-
+app.get("/trytest", async (req, res) => {
+  try {
+    const users = await User.find({ $where: "this.age==35" });
+    res.send({ message: "users fetched successfully", users });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
 
 connectDb()
   .then(() => {
