@@ -4,8 +4,12 @@ const app = express();
 const User = require("./models/user");
 const { validateSignupData } = require("./utils/validate");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
+app.use(cookieParser());
 
 //Create API to add users ie /signup
 app.post("/signup", async (req, res) => {
@@ -48,6 +52,15 @@ app.post("/login", async (req, res) => {
     const ispasswordValid = await bcrypt.compare(password, user.password);
 
     if (ispasswordValid) {
+      // create JWT
+      const token = await jwt.sign({ _id: user._id }, "Prash@123", {
+        expiresIn: "1d"
+      });
+      console.log("token: ", token);
+
+      // send the cokkies
+      res.cookie("tokencookie", token, {expires: new Date(Date.now() + 8 * 3600000)});
+
       res.send("Logged in sucessuly !!!!");
     } else {
       throw new Error("Invalid credentials");
@@ -56,6 +69,27 @@ app.post("/login", async (req, res) => {
     res.status(500).send("Error: " + err.message);
   }
 });
+
+// get profie api
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch (err) {
+    res.status(500).send("Error" + err.message);
+  }
+});
+
+//send connection request
+
+app.post("/sendConnectionRequest", userAuth, async(req, res, next)=>{
+
+  const user = req.user
+  res.send(user.firstName + " sent connection request  !!!")
+})
+
+
 
 //get api: get user single user
 
