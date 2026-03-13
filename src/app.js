@@ -49,17 +49,18 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid credentials");
     }
 
-    const ispasswordValid = await bcrypt.compare(password, user.password);
+    const ispasswordValid = await user.validatePassword(password)
 
     if (ispasswordValid) {
       // create JWT
-      const token = await jwt.sign({ _id: user._id }, "Prash@123", {
-        expiresIn: "1d"
-      });
+      const token = await user.getJWT();
+
       console.log("token: ", token);
 
       // send the cokkies
-      res.cookie("tokencookie", token, {expires: new Date(Date.now() + 8 * 3600000)});
+      res.cookie("tokencookie", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
 
       res.send("Logged in sucessuly !!!!");
     } else {
@@ -83,13 +84,10 @@ app.get("/profile", userAuth, async (req, res) => {
 
 //send connection request
 
-app.post("/sendConnectionRequest", userAuth, async(req, res, next)=>{
-
-  const user = req.user
-  res.send(user.firstName + " sent connection request  !!!")
-})
-
-
+app.post("/sendConnectionRequest", userAuth, async (req, res, next) => {
+  const user = req.user;
+  res.send(user.firstName + " sent connection request  !!!");
+});
 
 //get api: get user single user
 
