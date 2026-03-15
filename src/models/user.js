@@ -27,7 +27,10 @@ const userSchema = new mongoose.Schema(
         {
           validator: async function (value) {
             const user = await mongoose.models.User.findOne({ emailId: value });
-            return !user;
+
+            if (!user) return true;
+
+            return user._id.toString() === this._id.toString();
           },
           message: "Email already exists",
         },
@@ -95,16 +98,18 @@ userSchema.methods.getJWT = async function () {
   return token;
 };
 
+userSchema.methods.validatePassword = async function (passswordINputByuser) {
+  const user = this;
 
-userSchema.methods.validatePassword = async function(passswordINputByuser){
-  const user = this
+  const passwordHash = user.password;
 
-  const passwordHash = user.password
+  const ispasswordValid = await bcrypt.compare(
+    passswordINputByuser,
+    passwordHash,
+  );
 
-  const ispasswordValid = await bcrypt.compare(passswordINputByuser, passwordHash)
-
-  return ispasswordValid
-}
+  return ispasswordValid;
+};
 
 // model name starts with capitle  case
 const UserModel = mongoose.model("User", userSchema);
