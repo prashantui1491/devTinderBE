@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       minLength: 4,
       maxLength: 100,
+      index: true
     },
     lastName: {
       type: String,
@@ -110,6 +111,8 @@ userSchema.methods.validatePassword = async function (passswordINputByuser) {
 
   return ispasswordValid;
 };
+
+userSchema.index({firstName: 1, lastName:1})
 
 // model name starts with capitle  case
 const UserModel = mongoose.model("User", userSchema);
