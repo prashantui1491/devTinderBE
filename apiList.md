@@ -12,14 +12,12 @@
 
 ## connectionRequesrRouter:
     7. POST /request/send/intrested/:userId
-    8. POST /request/send/ignored/:userId
-    9. POST /request/review/accepted/:requestId
-    10. POST /request/review/rejected/:requestId
+    8. POST /request/review/accepted/:requestId
 
 ## userRouter:
-    11. GET /user/connections
-    12. GET /user/requests
-    13. GET /user/feed - get profiles of other users
+    9. GET /user/requests/recieved
+    10. GET /user/connections
+    11. GET /user/feed - get profiles of other users
 
 
 status: ignore, intrested, accepted, rejected
