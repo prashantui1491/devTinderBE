@@ -21,3 +21,8 @@
 
 
 status: ignore, intrested, accepted, rejected
+
+## DevTinder Project Repos - Akshay
+
+DevTinder Frontend Code: https://github.com/akshaymarch7/devTinder-web
+DevTinder Backend Code: https://github.com/akshaymarch7/devTinder
