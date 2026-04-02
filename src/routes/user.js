@@ -3,6 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 
 const userRouter = express.Router();
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl about skils";
 
@@ -52,6 +53,49 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     res.json({ data: data });
   } catch (err) {
     res.status(400).send({ message: err.message });
+  }
+});
+
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    // User should not see all the cards except
+    //1. his own card
+    //2. his connections
+    //3. igonred people
+    //4. already sent the connection request
+
+    const loggedInUser = req.user;
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+
+    limit = limit > 50 ? 50 : limit;
+
+    const skip = (page - 1) * limit;
+
+    const connectionRequest = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+
+    const hidePeoplefromfeed = new Set();
+
+    connectionRequest.forEach((request) => {
+      hidePeoplefromfeed.add(request.fromUserId.toString());
+      hidePeoplefromfeed.add(request.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hidePeoplefromfeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ message: "feed fetched successfully", data: users });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
